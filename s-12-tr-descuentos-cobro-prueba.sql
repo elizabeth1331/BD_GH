@@ -8,6 +8,16 @@
 --TAMBIÉN SE SOLICITA CREAR UNA NUEVA TABLA DONDE SE LLEVARA EL REGISTRO DE LOS DESCUENTOS, 
 --DICHA TABLA DEBERA LLAMARSE 'REGISTRO_PROMOCION' Y USANDO UNA SECUENCIA LLAMADA registro_promocion_seq
 
+/*set linesize window
+col direccion format A20
+col nombre_usuario format A20
+col clave format A2
+col descripcion format A10
+*/
+
+Prompt Creando Trigger de promociones
+@@s-11-tr-descuentos-cobro
+
 Prompt Probando trigger tr_descuentos_cobro.
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------Escenario 1:----------------------------------------------------------------------------------
@@ -28,23 +38,26 @@ where vv.vivienda_id=3;
 
 
 
-v_var varchar2(300);
-v_registro_promocion_id  registro_promocion.registro_promocion_id%type;
-v_vivienda_id registro_promocion.vivienda_id%type;
-v_usuario_id  registro_promocion.usuario_id%type;
-v_precio_inicial  registro_promocion.precio_inicial%type;
-v_monto_pagado  registro_promocion.monto_pagado%type;
-v_numero_pago  registro_promocion.numero_pago%type;
-v_tipo_descuento  registro_promocion.tipo_descuento%type;
-v_count number;
-v_nombre_usuario usuario.nombre_usuario%type;
-v_folio vivienda_venta.folio%type;
-v_ult_num_pag pago_vivienda.num_pago%type;
-v_importe pago_vivienda.importe%type;
+v_var                         varchar2(300);
+v_registro_promocion_id       registro_promocion.registro_promocion_id%type;
+v_vivienda_id                 registro_promocion.vivienda_id%type;
+v_usuario_id                  registro_promocion.usuario_id%type;
+v_precio_inicial              registro_promocion.precio_inicial%type;
+v_monto_pagado                registro_promocion.monto_pagado%type;
+v_numero_pago                 registro_promocion.numero_pago%type;
+v_tipo_descuento              registro_promocion.tipo_descuento%type;
+v_count                       number;
+v_nombre_usuario              usuario.nombre_usuario%type;
+v_folio                       vivienda_venta.folio%type;
+v_ult_num_pag                 pago_vivienda.num_pago%type;
+v_importe                     pago_vivienda.importe%type;
 begin
 insert into PAGO_VIVIENDA(vivienda_id,num_pago,fecha,pdf_pago,importe) values (3,32,to_date('24/09/2010','dd/mm/yyyy'),empty_blob(),9500);
 commit;
+
+dbms_output.put_line('-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --');
 dbms_output.put_line('Insertando registro  con vivienda id 3, numero de pago 32 fecha del registro 09/24/2010 y un importe de 9500');
+dbms_output.put_line('-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --');
 
 select count(*)
 into  v_count 
@@ -53,25 +66,35 @@ where rp.vivienda_id=3
 and rp.numero_pago=32;
 
 
-dbms_output.put_line('llega a este punto?' ||v_count);
 if v_count=0 then 
   
   open cur_registro_cliente;
-    dbms_output.put_line('---------------Usuario sin descuento en su pago---------------');
-    dbms_output.put_line('Registro de pagos del cliente');
+    dbms_output.put_line('-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --');
+    dbms_output.put_line('----------------------------------------------------Usuario sin descuento en su pago-----------------------------------------------------');
+    dbms_output.put_line('                                                     Registro de pagos del cliente');
+    dbms_output.put_line('-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --');
     loop
       fetch cur_registro_cliente 
       into v_ult_num_pag,v_importe,v_folio,v_precio_inicial,v_nombre_usuario;
     exit when cur_registro_cliente%notfound;
   
-    dbms_output.put_line('Nombre de usuario '||v_nombre_usuario||' folio  '||v_folio||' Saldo del deposito '||v_importe||' Número de pago '|| v_ult_num_pag);
+    dbms_output.put_line('Nombre de usuario                   folio                   Saldo del deposito                    Número de pago                   ');
+    dbms_output.put_line(  v_nombre_usuario  ||'          '||v_folio||'                '||v_importe||'                   '|| v_ult_num_pag);
   
     end loop;
   close cur_registro_cliente;
-
+  
 else 
    if v_tipo_descuento <>'v1' then 
-    v_var:='El usuario obtuvo un descuento en su pago del 10%  Los datos del registro son   Numero de registro de la promocion '
+    dbms_output.put_line('-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --');
+    v_var:='                                         El usuario obtuvo un descuento en su pago del 10%  Los datos del registro son   ';
+    dbms_output.put_line(v_var);
+    dbms_output.put_line('-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --');
+    v_var:=' Numero de registro de la promocion      Vivienda_id      Usuario id  Precio inicial   Monto pagado    Número de pago  ';
+    dbms_output.put_line(v_var);
+    v_var:='                          El usuario obtuvo un descuento en su pago del 10%  Los datos del registro son   '
+    ||'-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --'
+    ||'Numero de registro de la promocion  '
     ||v_registro_promocion_id
     ||' Vivienda_id '
     ||v_vivienda_id
@@ -125,19 +148,19 @@ on pv.vivienda_id=vv.vivienda_id
 join usuario u
 on u.usuario_id=vv.usuario_id
 where vv.vivienda_id=3;
-v_registro_promocion_id  registro_promocion.registro_promocion_id%type;
-v_vivienda_id registro_promocion.vivienda_id%type;
-v_usuario_id  registro_promocion.usuario_id%type;
-v_precio_inicial  registro_promocion.precio_inicial%type;
-v_monto_pagado  registro_promocion.monto_pagado%type;
-v_numero_pago  registro_promocion.numero_pago%type;
-v_tipo_descuento  registro_promocion.tipo_descuento%type;
-v_count number;
-v_var varchar2(300);
-v_nombre_usuario usuario.nombre_usuario%type;
-v_folio vivienda_venta.folio%type;
-v_ult_num_pag pago_vivienda.num_pago%type;
-v_importe pago_vivienda.importe%type;
+v_registro_promocion_id            registro_promocion.registro_promocion_id%type;
+v_vivienda_id                      registro_promocion.vivienda_id%type;
+v_usuario_id                       registro_promocion.usuario_id%type;
+v_precio_inicial                   registro_promocion.precio_inicial%type;
+v_monto_pagado                     registro_promocion.monto_pagado%type;
+v_numero_pago                      registro_promocion.numero_pago%type;
+v_tipo_descuento                   registro_promocion.tipo_descuento%type;
+v_count                            number;
+v_var                              varchar2(300);
+v_nombre_usuario                   usuario.nombre_usuario%type;
+v_folio                            vivienda_venta.folio%type;
+v_ult_num_pag                      pago_vivienda.num_pago%type;
+v_importe                          pago_vivienda.importe%type;
 begin
 insert into PAGO_VIVIENDA(vivienda_id,num_pago,fecha,pdf_pago,importe) values (7,9,to_date('20/05/2020','dd/mm/yyyy'),empty_blob(),9500);
 commit;

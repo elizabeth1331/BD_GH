@@ -3,6 +3,8 @@
 --@Descripción: CREACION DE TRIGGER TIPO ROW LEVEL
 
  @@funciones_anonimas.sql
+set linesize window
+
 
 set serveroutput on
 declare
@@ -36,9 +38,10 @@ begin
   v_anio:=2020;
   datos_usuario (09,2020);
   open cur_ver_elim_tarjeta;
-    
-    dbms_output.put_line('-------------------------------------------REGISTROS DE TARJETAS_CADUCAS----------------------------------');
-    dbms_output.put_line('----------------------------------------------VISTOS DESDE UN CURSOR--------------------------------------');
+    dbms_output.put_line('-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --');
+    dbms_output.put_line('----------------------------------------------------REGISTROS DE TARJETAS_CADUCAS--------------------------------------------------------');
+    dbms_output.put_line('--------------------------------------------------------VISTOS DESDE UN CURSOR-----------------------------------------------------------');
+    dbms_output.put_line('-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --');
 
     v_var:=' Tarjeta_id ---------------- Número de tarjeta   Caduco el  MM/YYYY ----------  hace  NN años con NN meses ---------------Número de seguridad  ' 
       ||v_num_seguridad;
@@ -50,17 +53,17 @@ begin
 
       v_var:='     '
       ||v_tarjeta_id
-      ||'  ----------  '
+      ||'                    '
       || v_num_tarjeta
-      ||'  ----------  '
+      ||'                    '
       || v_anio_exp
       ||'/' 
       ||v_mes_exp
-      ||'  ----------  '
+      ||'                    '
       ||resta_anio(v_anio,v_anio_exp) 
       ||'  años con  '
       ||resta_mes(v_mes_exp,v_mes)  
-      ||'  meses      ----------  ' 
+      ||'  meses                    ' 
       ||v_num_seguridad;
       dbms_output.put_line(v_var);
       dbms_output.put_line('----------------------------------------------------------------------------------------------------------------------------------');
@@ -86,6 +89,15 @@ end;
 /
 show errors
 
+col nombre  format A20
+col nombre_usuario format A20
+col clave format A2
+col descripcion format A10
+col ap_paterno format A10
+col ap_materno format A10
+col contrasena  format A10
+col tipo  format A5
+col email  format A10
 
 
 
@@ -98,7 +110,7 @@ from v_usuario;
 
 cursor cur_ver_usuario is
 select nombre_usuario,nombre,ap_paterno,ap_materno,email,contrasena,tipo
-from aux_elim_usuario;
+from aux_usuario_activo;
 v_tipo char(2);
 v_nombre_usuario varchar2(30);
 v_nombre varchar2(30);
@@ -118,7 +130,7 @@ begin
     
     dbms_output.put_line('----------------------------------------REGISTROS DE USUARIOS ACTIVOS----------------------------------------');
     dbms_output.put_line('-------------------------------------------VISTOS DESDE UN CURSOR--------------------------------------------');
-    v_var:=' Usuario_id ---------------- User  ----------------  Nombre ---------------- Apellido Paterno ---------------- Apellido Materno ---------------- Email ---------------- contraseña ---------------- Tipo (NA sin actividad, VR vivienda Rentada, VV Vivienda Vendida y VA vivienda Alquilada)';
+    v_var:='Usuario_id --------- User --------- Nombre --------- Apellido Paterno --------- Apellido Materno --------- Email --------- Contraseña --------- Tipo (NA sin actividad, VR vivienda Rentada, VV Vivienda Vendida y VA vivienda Alquilada)';
     dbms_output.put_line(v_var);
 
     loop
@@ -128,19 +140,19 @@ begin
 
      v_var:='      '
       ||buscar_id_usuario(v_email)
-      ||' ----------------  '
+      ||'                    '
       || v_nombre_usuario
-      ||'  ----------------  '
+      ||'                    '
       || v_nombre
-      ||'  ----------------  '
+      ||'                    '
       ||v_ap_paterno
-      ||'  ----------------  '
+      ||'                    '
       ||v_ap_materno
-      ||'  ----------------  ' 
+      ||'                    '
       ||v_email
-      ||'  ----------------  '
+      ||'                    '
       ||v_contrasena
-      ||'  ----------------  '
+      ||'                    '
       ||v_tipo;
       dbms_output.put_line(v_var);
       dbms_output.put_line('-------------------------------------------------------------------------------------------------------------');
@@ -161,9 +173,9 @@ begin
 
      v_var:='      '
       ||buscar_id_usuario(v_v_email)
-      ||' ----------------  '
+      ||'                    '
       || v_user
-      ||'  ----------------  '
+      ||'                    '
       || v_v_email;
       dbms_output.put_line(v_var);
       dbms_output.put_line('-------------------------------------------------------------------------------------------------------------');
@@ -200,7 +212,7 @@ from(
   from usuario
     minus
   select usuario_id,nombre_usuario,nombre,ap_paterno,ap_materno,email,contrasena
-  from aux_elim_usuario);
+  from aux_usuario_activo);
 
 v_nombre_usuario_e varchar2(30);
 v_nombre_e varchar2(30);
@@ -232,19 +244,19 @@ begin
 
      v_var_e:='      '
       ||v_usuario_id_e
-      ||' ----------------  '
+      ||'                    '
       || v_nombre_usuario_e
-      ||'  ----------------  '
+      ||'                    '
       || v_nombre_e
-      ||'  ----------------  '
+      ||'                    '
       ||v_ap_paterno_e
-      ||'  ----------------  '
+      ||'                    '
       ||v_ap_materno_e
-      ||'  ----------------  ' 
+      ||'                    '
       ||v_email_e
-      ||'  ----------------  '
+      ||'                    '
       ||v_contrasena_e
-      ||'  ----------------  ';
+      ||'                    ';
       dbms_output.put_line(v_var_e);
       dbms_output.put_line('----------------------------------------------------------------------------------------------------------------------------------');
 
@@ -261,11 +273,11 @@ begin
     from usuario
       minus
     select usuario_id,nombre_usuario,nombre,ap_paterno,ap_materno,email,contrasena
-    from aux_elim_usuario
+    from aux_usuario_activo
   );
 
   select count(*) into v_user_activos
-  from aux_elim_usuario;
+  from aux_usuario_activo;
 
   select count(*) into v_user_totales
   from usuario;
@@ -274,9 +286,9 @@ begin
   dbms_output.put_line(v_var_e);
   v_var_e:='                 '
       ||v_user_totales
-      ||' ----------------  '
+      ||'                    '
       || v_user_activos
-      ||'  ----------------  '
+      ||'                    '
       || v_user_incativos;
   dbms_output.put_line(v_var_e);
 

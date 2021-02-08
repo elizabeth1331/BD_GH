@@ -69,14 +69,12 @@ Prompt Creando vistas
 Prompt Carga inicial
 @@s-09-carga-inicial.sql
 commit;
---Prompt creando función Buscar usuario
---@@s-15-fx-buscar-usuario.sql
-Prompt Creando Trigger de promociones
-@@s-11-tr-descuentos-cobro
+
 Prompt Validando Trigger de promociones
 @@s-12-tr-descuentos-cobro-prueba
 Prompt Validando cambios en tabla tarjeta de credito y depurando registros
 @@s-14-p-deputa-tarjeta-prueba.sql
+
 Prompt Consultas
 @@s-10-consultas.sql
 Prompt Prueba Procdimiento penalizacion_calificacion

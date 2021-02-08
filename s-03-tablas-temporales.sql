@@ -6,27 +6,54 @@
 ----------------------------------------------CREACION DE TABLA TEMPORAL------------------------------------------------
 -------------------------------------------------------------------------------------------------------------
 
---Contexto:
---El usuario podra tener un registro de las viviendas de interes,
---Se lleva el registro del usuario por si se confirman las opciones (id y nombre_usuario).
---Se registran datos de interes sobre la vivienda agregada (id, tipo de vivienda, estado de la vivienda)
+--Bloque anonimo que  valida si se puede o no crear la tabla temporal (si existe o no en el esquema)
 
-CREATE GLOBAL TEMPORARY TABLE opciones_vivienda(
-  usuario_id 				number(10,0)	not null,
-  nombre_usuario 		 	number(10,0) 	not null,
-  vivienda_id 				number(10,0) 	not null,
-  es_v_venta 				number(1,0) 	not null,
-  es_v_renta				number(1,0)		not null,
-  es_v_vacacionar			number(1,0)		not null,
-  --FECHA_ESTATUS DATE NOT NULL,
-  estatus_vivienda_id		number(10,0)	not null 
-) on commit preserve rows;
+set serveroutput on
+declare
+v_c number;
+v_c2 number;
+begin
+  select count(*) into v_c
+  from user_tables
+  where table_name='aux_usuario_activo';
+  dbms_output.put_line('Crea tabla aux_usuario_activo y vista en caso de no existir ');
+  if v_c=0 then
+    execute immediate 'CREATE  GLOBAL TEMPORARY TABLE aux_usuario_activo(
+    usuario_id          number(10,0),
+    nombre_usuario     varchar2(20),
+    nombre             varchar2(30),
+    ap_paterno         varchar2(30),
+    ap_materno         varchar2(30),
+    email              varchar2(200),
+    contrasena           varchar2(40),
+    tipo               varchar2(2),
+    vivienda_id         number(10,0)
+    ) on commit preserve rows';  
 
---Argumentación opciones tabla:
---global temporary:
---  Tenemos datos en memoria que pueden guardarse o no de forma permanente.
---on commit preserve rows:
---  Al realizar commit los registros segiran existiendo 
---  permitiendo el almacenado permanente de los datos en alguna otra tabla.
+  end if;
+  if v_c>0 then    
+    dbms_output.put_line('La tabla ya existe');
+  end if;
+  select count(*) into v_c2
+  from user_tables
+  where table_name='AUX_ELIM_TARJETA';
+  dbms_output.put_line('Crea tabla aux_elim_tarjeta y vista en caso de no existir ');
+  if v_c2=0 then
+    execute immediate 'CREATE GLOBAL TEMPORARY TABLE aux_elim_tarjeta(
+    tarjeta_id          number(10,0),
+    num_seguridad       number(4,0),
+    num_tarjeta         number(16,0), 
+    mes_exp             number(2,0),
+    anio_exp            number(4,0)
+    ) on commit preserve rows';  
+    
+  end if;
+  if v_c2>0 then    
+    dbms_output.put_line('La table ya existe  ');
+  end if;
+
+end;
+/
+show errors
 
 

@@ -18,17 +18,17 @@ before insert
 on pago_vivienda
 for each row
 declare
-v_vivienda_id REGISTRO_PROMOCION.vivienda_id%type;
-v_monto_pagado REGISTRO_PROMOCION.monto_pagado%type;
-v_precio_inicial vivienda_venta.precio_inicial%type;
-v_ult_num_pag pago_vivienda.num_pago%type;
-v_ult_num_pago pago_vivienda.num_pago%type;
-v_importe pago_vivienda.importe%type;
-v_usuario_id usuario.usuario_id%type;
-v_var varchar2(300);
-v_restante number;
-v_rp_id number;
-v_num_promo number;
+v_vivienda_id              REGISTRO_PROMOCION.vivienda_id%type;
+v_monto_pagado             REGISTRO_PROMOCION.monto_pagado%type;
+v_precio_inicial           vivienda_venta.precio_inicial%type;
+v_ult_num_pag              pago_vivienda.num_pago%type;
+v_ult_num_pago             pago_vivienda.num_pago%type;
+v_importe                  pago_vivienda.importe%type;
+v_usuario_id               usuario.usuario_id%type;
+v_var                      varchar2(300);
+v_restante                 number;
+v_rp_id                    number;
+v_num_promo                number;
 begin
   case 
     when inserting then
@@ -63,8 +63,7 @@ begin
 
            select registro_promocion_seq.nextval into v_num_promo from dual;
           insert into REGISTRO_PROMOCION(registro_promocion_id, vivienda_id,usuario_id,precio_inicial,monto_pagado,numero_pago,tipo_descuento) 
-          values (v_num_promo,:new.vivienda_id,v_usuario_id,v_precio_inicial ,v_monto_pagado,v_ult_num_pag+1,'v2');
-          dbms_output.put_line(v_var); 
+          values (v_num_promo,:new.vivienda_id,v_usuario_id,v_precio_inicial ,v_monto_pagado,v_ult_num_pag+1,'v2'); 
 
         else
           v_var :='Pago realizado con exito ';

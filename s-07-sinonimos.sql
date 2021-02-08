@@ -2,7 +2,7 @@
 --@Fecha creación: 01/02/2021
 --@Descripción: CREACION DE TRES O MAS SINONIMOS DEL CASO DE ESTUDIO
 
-
+--permisos y creacion de sinonimos 
 create or replace public synonym usuario for gm_proy_admin.usuario;
 create or replace public synonym vivienda for gm_proy_admin.vivienda;
 create or replace public synonym vivienda_servicio for gm_proy_admin.vivienda_servicio;
@@ -18,6 +18,7 @@ create or replace  synonym new_vivienda for mg_proy_invitado.vivienda;
 create or replace synonym new_vivienda_servicio for mg_proy_invitado.vivienda_servicio;
 create or replace synonym new_servicio for mg_proy_invitado.servicio;
 
+--Bloque anonimo que crea sinonimos de todas las tablas del esquema 
 set serveroutput on
 declare
 --declaración del cursor

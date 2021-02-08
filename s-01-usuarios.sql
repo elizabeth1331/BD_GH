@@ -1,5 +1,5 @@
 --@Autor(es): GARCIA MENESES JEREMY, MENDOZA DE LA VEGA DULCE ELIZABETH
---@Fecha creación: dd/01/2021
+--@Fecha creación: 05s/01/2021
 --@Descripción: CREACION DE USUARIOS Y PERMISOS NECESARIOS PARA EL CASO DE ESTUDIOS 
 
 
@@ -51,4 +51,4 @@ prompt copiando los archivos csv a /tmp/bases
 !cp respaldo_usuario.csv /tmp/bases
 prompt cambiando permisos
 !chmod 777 /tmp/bases
-!chmod 777 /home/jeremy/Desktop/Proy_VFinal
+!chmod 777 /home/dulce/Downloads/GH_BD-PROYECTO_FINAL_FUNCIONAL

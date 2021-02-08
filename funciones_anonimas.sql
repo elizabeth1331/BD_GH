@@ -4,76 +4,29 @@
 
 
 
-set serveroutput on
-declare
-v_c number;
-v_c2 number;
-begin
-  select count(*) into v_c
-  from user_tables
-  where table_name='AUX_ELIM_USUARIO';
-  dbms_output.put_line('Crea tabla aux_elim_usuario y vista en caso de no existir ');
-  if v_c=0 then
-    execute immediate 'CREATE  GLOBAL TEMPORARY TABLE aux_elim_usuario(
-    usuario_id          number(10,0),
-    nombre_usuario     varchar2(20),
-    nombre             varchar2(30),
-    ap_paterno         varchar2(30),
-    ap_materno         varchar2(30),
-    email              varchar2(200),
-    contrasena           varchar2(40),
-    tipo               varchar2(2),
-    vivienda_id         number(10,0)
-    ) on commit preserve rows';  
-
-  end if;
-  if v_c>0 then    
-    dbms_output.put_line('La tabla ya existe');
-  end if;
-  select count(*) into v_c2
-  from user_tables
-  where table_name='AUX_ELIM_TARJETA';
-  dbms_output.put_line('Crea tabla aux_elim_tarjeta y vista en caso de no existir ');
-  if v_c2=0 then
-    execute immediate 'CREATE GLOBAL TEMPORARY TABLE aux_elim_tarjeta(
-    tarjeta_id          number(10,0),
-    num_seguridad       number(4,0),
-    num_tarjeta         number(16,0), 
-    mes_exp             number(2,0),
-    anio_exp            number(4,0)
-    ) on commit preserve rows';  
-    
-  end if;
-  if v_c2>0 then    
-    dbms_output.put_line('La table ya existe  ');
-  end if;
-
-end;
-/
-show errors
-
-
 --SE BUSCA DEPURAR LOS REGISTROS DE LAS TARJETAS DE CREDITO ENCONTRADOS EN LA BD, ADEMAS DE LIMPIAR LOS USUARIOS
-@@s-15-fx-buscar-usuario.sql
+@@s-15-fx-funciones_depura_tarjeta.sql
 -- FUNCIONES USADAS EN EL PROCEDIMIENTO 
 @@s-13-p-datos-usuario.sql
 commit;
 
+
+--Bloque anonimo que guarda todos los usuarios que estan relacionados con una vivienda
 set serveroutput on
 declare
-v_var varchar2(400);
-v_email varchar2(200);
-v_nombre_usuario usuario.nombre_usuario%type;
-v_nombre varchar2(40);
-v_count number;
-v_val number;
-v_ap_paterno usuario.ap_paterno%type;
-v_ap_materno varchar2(30);
-v_contrasena usuario.contrasena%type;
-v_tipo char(2);
-v_id number(10,0);
-v_id_u number(10,0);
-v_usuario_id number(10,0);
+v_var                         varchar2(400);
+v_email                       varchar2(200);
+v_nombre_usuario              usuario.nombre_usuario%type;
+v_nombre                      varchar2(40);
+v_count                       number;
+v_va                          number;
+v_ap_paterno                  usuario.ap_paterno%type;
+v_ap_materno                  varchar2(30);
+v_contrasena                  usuario.contrasena%type;
+v_tipo                        char(2);
+v_id                          number(10,0);
+v_id_u                        number(10,0);
+v_usuario_id                  number(10,0);
 cursor cur_elim_usuario is
 select nombre_usuario,nombre,ap_paterno,ap_materno,email,contrasena
 from(
@@ -116,7 +69,7 @@ open cur_elim_usuario;
       where email=v_email;
       v_usuario_id:=v_id_u;
 
-      insert into aux_elim_usuario(usuario_id,nombre_usuario,nombre,ap_paterno,ap_materno,email,contrasena,tipo)
+      insert into aux_usuario_activo(usuario_id,nombre_usuario,nombre,ap_paterno,ap_materno,email,contrasena,tipo)
       values (v_usuario_id,v_nombre_usuario,v_nombre,v_ap_paterno,v_ap_materno,v_email,v_contrasena,v_tipo);
 
     end loop;
